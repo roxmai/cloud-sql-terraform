@@ -1,0 +1,6 @@
+project_id     = "your-gcp-project-id"
+region         = "us-central1"
+instance_name  = "my-sql-instance"
+database_name  = "mydatabase"
+db_user        = "admin"
+db_password    = "your-secure-password"
