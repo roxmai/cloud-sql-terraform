@@ -1,45 +1,56 @@
+terraform {
+  required_version = ">= 1.0.0"
+
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.0.0"
+    }
+  }
+}
+
 provider "google" {
-  project = var.project_id
+  project = var.project
   region  = var.region
 }
 
 resource "google_sql_database_instance" "default" {
   name             = var.instance_name
-  database_version = "MYSQL_5_7"
+  database_version = "MYSQL_8_0"
 
   settings {
-    tier = "db-f1-micro" # Lowest available tier
+    tier = "db-f1-micro"  # Lowest tier
 
     ip_configuration {
-      ipv4_enabled    = true
-      require_ssl     = false
+      ipv4_enabled = true
 
-      # Allow connections from any IP address
-      authorized_networks = [
-        {
-          name  = "public"
-          value = "0.0.0.0/0"
-        },
-      ]
+      dynamic "authorized_networks" {
+        for_each = var.authorized_networks
+        content {
+          value = authorized_networks.value
+        }
+      }
     }
 
-    # Optional: Enable automatic storage increase
-    storage_auto_resize = true
-    # Optional: Set initial storage size in GB
-    data_disk_size_gb = 10
+    backup_configuration {
+      enabled = false
+    }
+
+    disk_autoresize = true      # Updated from storage_auto_resize
+    disk_size       = 10        # Updated from data_disk_size_gb
+    disk_type       = "PD_SSD"  # Updated from data_disk_type
   }
 }
 
-resource "google_sql_database" "default" {
-  name     = var.database_name
+resource "google_sql_user" "default" {
+  name     = var.db_user
+  password = var.db_password
   instance = google_sql_database_instance.default.name
 }
 
-# Note: Google Cloud SQL requires at least one user with authentication.
-# To minimize authentication requirements, create a user with a simple password.
-resource "google_sql_user" "default" {
-  name     = var.db_user
-  instance = google_sql_database_instance.default.name
-  host     = "%"
-  password = var.db_password
+resource "google_sql_database" "default" {
+  name      = var.database_name
+  instance  = google_sql_database_instance.default.name
+  charset   = "utf8"
+  collation = "utf8_general_ci"
 }

@@ -4,3 +4,4 @@ instance_name  = "my-sql-instance"
 database_name  = "mydatabase"
 db_user        = "admin"
 db_password    = "your-secure-password"
+authorized_networks = ["0.0.0.0/0"]  # Allows all IP addresses

@@ -1,34 +1,39 @@
-variable "project_id" {
-  description = "The ID of the Google Cloud project."
+variable "project" {
+  description = "The GCP project ID"
   type        = string
 }
 
 variable "region" {
-  description = "The region where the SQL instance will be created."
+  description = "The GCP region"
   type        = string
   default     = "us-central1"
 }
 
 variable "instance_name" {
-  description = "The name of the Cloud SQL instance."
+  description = "The name of the Cloud SQL instance"
   type        = string
   default     = "my-sql-instance"
 }
 
+variable "authorized_networks" {
+  description = "List of authorized networks (in CIDR format)"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]  # Allows all IP addresses
+}
+
 variable "database_name" {
-  description = "The name of the database to create."
+  description = "Name of the initial database to create"
   type        = string
   default     = "mydatabase"
 }
 
 variable "db_user" {
-  description = "The database user name."
+  description = "Database admin user"
   type        = string
-  default     = "admin"
 }
 
 variable "db_password" {
-  description = "The password for the database user."
+  description = "Database admin password"
   type        = string
   sensitive   = true
 }
